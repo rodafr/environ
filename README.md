@@ -27,3 +27,24 @@ if err := l.Err(); err != nil {
  return err // lists all missing vars at once
 }
 ```
+
+```go
+// in testing, use a map:
+func MapLookup(m map[string]string) LookupFunc {
+ return func(k string) (string, bool) {
+  v, ok := m[k]
+  return v, ok
+ }
+}
+
+var testMap = map[string]string{
+ "SET":   "true",
+ "EMPTY": "",
+}
+
+load := NewLoader(MapLookup(testMap))
+```
+
+## TODO
+
+- [ ] Provide convenience function to lookup from env files
