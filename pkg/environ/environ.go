@@ -4,6 +4,7 @@ package environ
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -50,4 +51,13 @@ func (l *Loader) Bool(key string, def ...bool) bool {
 
 func (l *Loader) Dur(key string, def ...time.Duration) time.Duration {
 	return l.load(key, "duration", def, time.ParseDuration)
+}
+
+func (l *Loader) Secs(key string, def ...time.Duration) time.Duration {
+	return l.load(key, "duration as seconds", def, func(s string) (time.Duration, error) { return time.ParseDuration(s + "s") })
+}
+
+// TODO: make this work
+func (l *Loader) URL(key string, def ...*url.URL) *url.URL {
+	return l.load(key, "url", def, url.Parse)
 }

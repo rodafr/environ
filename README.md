@@ -2,6 +2,13 @@
 
 Load environment variables with optional defaults
 
+## Supported types
+
+- `string`
+- `bool`
+- `time.Duration`
+- `string` as seconds to `time.Duration`, i.e. "10" gives 10 seconds.
+
 ## Usage
 
 ```go
