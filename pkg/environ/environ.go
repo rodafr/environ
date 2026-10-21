@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
 	"strconv"
 	"time"
 )
@@ -16,7 +17,12 @@ type Loader struct {
 	errs []error
 }
 
+// NewLoader returns a Loader for values from keys using the given LookupFunc.
+// Defaults to os.LookupEnv if no LookupFunc is given.
 func NewLoader(lf LookupFunc) *Loader {
+	if lf == nil {
+		lf = os.LookupEnv
+	}
 	return &Loader{lf: lf}
 }
 
