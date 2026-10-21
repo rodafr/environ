@@ -27,7 +27,7 @@ func (l *Loader) load[T any](key, kind string, def []T, parse func(string) (T, e
 	if s, ok := l.lf(key); ok && s != "" {
 		v, err := parse(s)
 		if err != nil {
-			l.errs = append(l.errs, fmt.Errorf("parse env var %q: %w", key, err))
+			l.errs = append(l.errs, fmt.Errorf("parse %s env var %q: %w", kind, key, err))
 			return zero
 		}
 		return v
@@ -60,4 +60,11 @@ func (l *Loader) Secs(key string, def ...time.Duration) time.Duration {
 // TODO: make this work
 func (l *Loader) URL(key string, def ...*url.URL) *url.URL {
 	return l.load(key, "url", def, url.Parse)
+}
+
+func MapLookup(m map[string]string) LookupFunc {
+	return func(k string) (string, bool) {
+		v, ok := m[k]
+		return v, ok
+	}
 }

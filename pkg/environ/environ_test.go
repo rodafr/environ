@@ -442,13 +442,6 @@ func TestURLLoader(t *testing.T) {
 	}
 }
 
-func MapLookup(m map[string]string) LookupFunc {
-	return func(k string) (string, bool) {
-		v, ok := m[k]
-		return v, ok
-	}
-}
-
 func MustParseDuration(t *testing.T, s string) time.Duration {
 	t.Helper()
 	dur, _ := time.ParseDuration(s)

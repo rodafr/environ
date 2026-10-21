@@ -10,4 +10,6 @@ import (
 func main() {
 	load := environ.NewLoader(os.LookupEnv)
 	fmt.Println(load.Str("EDITOR", "nvim"))
+	load.Str("SOMETHINGTHATHISNOTFOUND")
+	fmt.Println(load.Err().Error())
 }
