@@ -15,61 +15,39 @@ type Loader struct {
 	errs []error
 }
 
-func NewLoader(lf LookupFunc) Loader {
-	return Loader{lf: lf}
+func NewLoader(lf LookupFunc) *Loader {
+	return &Loader{lf: lf}
 }
 
-func (l *Loader) Error() error { return errors.Join(l.errs...) }
+func (l *Loader) Err() error { return errors.Join(l.errs...) }
 
-func (l *Loader) Str(key, defVal string) string {
-	if val, ok := l.lf(key); ok && val != "" {
-		return val
-	}
-	return defVal
-}
-
-func (l *Loader) ReqStr(key string) string {
-	if val, ok := l.lf(key); ok && val != "" {
-		return val
-	}
-	l.errs = append(l.errs, fmt.Errorf("required string env var %q not set", key))
-	return ""
-}
-
-func (l *Loader) Bool(key string, defVal bool) bool {
-	if val, ok := l.lf(key); ok && val != "" {
-		if b, err := strconv.ParseBool(val); err == nil {
-			return b
+func (l *Loader) load[T any](key, kind string, def []T, parse func(string) (T, error)) T {
+	var zero T
+	if s, ok := l.lf(key); ok && s != "" {
+		v, err := parse(s)
+		if err != nil {
+			l.errs = append(l.errs, fmt.Errorf("parse env var %q: %w", key, err))
+			return zero
 		}
+		return v
 	}
-	return defVal
+
+	if len(def) > 0 {
+		return def[0]
+	}
+
+	l.errs = append(l.errs, fmt.Errorf("required %s env var %q not set", kind, key))
+	return zero
 }
 
-func (l *Loader) ReqBool(key string) bool {
-	if val, ok := l.lf(key); ok && val != "" {
-		if b, err := strconv.ParseBool(val); err == nil {
-			return b
-		}
-	}
-	l.errs = append(l.errs, fmt.Errorf("required boolean env var %q not set", key))
-	return false
+func (l *Loader) Str(key string, def ...string) string {
+	return l.load(key, "string", def, func(s string) (string, error) { return s, nil })
 }
 
-func (l *Loader) Dur(key string, defVal time.Duration) time.Duration {
-	if val, ok := l.lf(key); ok && val != "" {
-		if b, err := time.ParseDuration(val); err == nil {
-			return b
-		}
-	}
-	return defVal
+func (l *Loader) Bool(key string, def ...bool) bool {
+	return l.load(key, "bool", def, strconv.ParseBool)
 }
 
-func (l *Loader) ReqDur(key string) time.Duration {
-	if val, ok := l.lf(key); ok && val != "" {
-		if b, err := time.ParseDuration(val); err == nil {
-			return b
-		}
-	}
-	l.errs = append(l.errs, fmt.Errorf("required time duration env var %q not set", key))
-	return 0
+func (l *Loader) Dur(key string, def ...time.Duration) time.Duration {
+	return l.load(key, "duration", def, time.ParseDuration)
 }
