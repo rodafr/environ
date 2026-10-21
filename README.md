@@ -14,6 +14,7 @@ Load environment variables with optional defaults
 
 ```go
 // create loader with wanted lookup func:
+// defaults to os.LookupEnv
 load := NewLoader(os.LookupEnv)
 
 // get value or (optional) default:
