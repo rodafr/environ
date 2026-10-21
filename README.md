@@ -8,6 +8,7 @@ Load environment variables with optional defaults
 - `bool`
 - `time.Duration`
 - `string` as seconds to `time.Duration`, i.e. "10" gives 10 seconds.
+- WIP: `url.URL`
 
 ## Usage
 
@@ -26,9 +27,9 @@ if err := load.Err(); err != nil {
 
 // use in a config struct assignment:
 cfg := Config{
- Host: load.Str("HOST", "localhost"),
- Port: load.Str("PORT", "8080"),
- DBURL:  load.Str("DATABASE_URL"),
+ UseFeature: load.Bool("FEATURE_FLAG"),
+ Threads: load.Int("THREADS", "5"),
+ DBURL:  load.URL("DATABASE_URL"),
 }
 if err := l.Err(); err != nil {
  return err // lists all missing vars at once
